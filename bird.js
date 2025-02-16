@@ -1,6 +1,6 @@
 let veloStep = 0.34;
 
-class bird {
+class Bird {
 	constructor(locX, locY, width, height) {
 		this.locX = locX;
 		this.locY = locY;
@@ -18,7 +18,7 @@ class bird {
 	}
 
 	outOfBoundsBottom() {
-		return this.locY > viewHeight - this.height;
+		return this.locY > GameState.viewHeight - this.height;
 	}
 
 	checkBounds() {
@@ -29,7 +29,7 @@ class bird {
 
 		if (this.outOfBoundsBottom()) {
 			this.velocity = 0;
-			this.move(viewHeight - this.height);
+			this.move(GameState.viewHeight - this.height);
 		}
 	}
 
@@ -47,8 +47,20 @@ class bird {
 		this.checkBounds();
 	}
 
-	draw() {
+	update() {
+		if (keyIsDown(32)) {
+			GameState.firstKeyPressed = true;
+			this.flap();
+		} else if (GameState.firstKeyPressed) {
+			this.notFlapping();
+		}
+	}
+
+	render() {
+		this.update();
+
 		console.log("Drawing bird at " + this.locX + ", " + this.locY);
+		fill("white");
 		rect(this.locX, this.locY, this.width, this.height);
 	}
 }

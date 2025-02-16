@@ -1,21 +1,47 @@
-let viewWidth = 800;
-let viewHeight = 600;
-let firstKeyPressed = false;
-const flappy = new bird(100, viewHeight / 2, 10, 10);
+const initialBird = new Bird(100, GameState.viewHeight / 2, 10, 10);
+let bird = initialBird;
+let pipeFactory = new PipeFactory();
 
 function setup() {
-	createCanvas(viewWidth, viewHeight);
+	createCanvas(GameState.viewWidth, GameState.viewHeight);
 }
 
 function draw() {
 	background("aqua");
 
-	if (keyIsDown(32)) {
-		firstKeyPressed = true;
-		flappy.flap();
-	} else if (firstKeyPressed) {
-		flappy.notFlapping();
-	}
+	stroke("black");
+	strokeWeight(2);
 
-	flappy.draw();
+	bird.render();
+	pipeFactory.update();
+
+	checkGameState();
+}
+
+function keyPressed() {
+	if (GameState.gameOver && keyIsDown(32)) {
+		GameState.gameOver = false;
+		bird = initialBird;
+		pipeFactory = new PipeFactory();
+		loop();
+	}
+}
+
+function checkGameState() {
+	if (
+		pipeFactory.locationTouchesPipe(
+			bird.locX,
+			bird.locY,
+			bird.width,
+			bird.height
+		)
+	) {
+		fill("white");
+		textSize(32);
+		stroke("black");
+		strokeWeight(4);
+		text("Game Over", GameState.viewWidth / 2 - 50, GameState.viewHeight / 2);
+		GameState.gameOver = true;
+		noLoop();
+	}
 }
