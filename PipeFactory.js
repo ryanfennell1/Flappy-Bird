@@ -1,29 +1,40 @@
-let gapMin = 200;
-let gapMax = 400;
+let gapMin = 150;
+let gapMax = 450;
 let pipeWidth = 50;
 let gapWidth = 100;
-let pipeSpacing = 200;
+let pipeSpacing = 275;
+let scrollSpeed = 3;
 
+// Create and manage pipes
 class PipeFactory {
 	constructor() {
 		this.pipes = [];
 	}
 
+	// New pipe, add to list
 	createPipe() {
 		let pipe = new Pipe(gapMin, gapMax, gapWidth);
 		this.pipes.push(pipe);
 	}
 
+	// Remove pipes when off screen
 	removeFrontPipe() {
 		this.pipes.splice(0, 1);
 	}
 
-	locationTouchesPipe(locX, locY, width, height) {
-		if (this.pipes === undefined || !GameState.firstKeyPressed) return;
+	// Check for collision (game over state)
+	birdTouchesPipe(bird) {
+		if (this.pipes === undefined || !GameState.firstKeyPressed) return false;
 
 		for (let pipe of this.pipes) {
-			if (locX + width >= pipe.locX && locX <= pipe.locX + pipe.width) {
-				if (locY <= pipe.pipeGap1 || locY + height >= pipe.pipeGap2) {
+			if (
+				bird.locX + bird.width >= pipe.locX &&
+				bird.locX <= pipe.locX + pipe.width
+			) {
+				if (
+					bird.locY <= pipe.pipeGap1 ||
+					bird.locY + bird.height >= pipe.pipeGap2
+				) {
 					return true;
 				}
 			}
@@ -31,6 +42,23 @@ class PipeFactory {
 		return false;
 	}
 
+	// Check for scoring, zone just after pipe within scroll speed
+	inScoreRange(bird) {
+		if (this.pipes === undefined || !GameState.firstKeyPressed) return;
+
+		let pipe = this.pipes[1];
+
+		for (let pipe of this.pipes.slice(0, 2)) {
+			if (
+				bird.locX > pipe.locX + pipe.width &&
+				bird.locX <= pipe.locX + pipe.width + scrollSpeed
+			) {
+				return true;
+			}
+		}
+	}
+
+	// Update and render all pipes, create new pipes when we need one
 	update() {
 		if (this.pipes === undefined || !GameState.firstKeyPressed) return;
 
@@ -52,6 +80,7 @@ class PipeFactory {
 	}
 }
 
+// Singular pipe objects
 class Pipe {
 	constructor(gapMin, gapMax, gapWidth) {
 		this.locX = GameState.viewWidth;
@@ -61,10 +90,12 @@ class Pipe {
 		this.width = pipeWidth;
 	}
 
+	// update position based on scroll speed
 	update() {
-		this.locX -= 2;
+		this.locX -= scrollSpeed;
 	}
 
+	// render pipe
 	render() {
 		fill("green");
 		rect(this.locX, this.locY, this.width, this.pipeGap1);

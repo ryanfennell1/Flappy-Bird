@@ -21,6 +21,7 @@ class Bird {
 		return this.locY > GameState.viewHeight - this.height;
 	}
 
+	// If out of bounds, stick bird to bottom/top with 0 velocity
 	checkBounds() {
 		if (this.outOfBoundsTop()) {
 			this.velocity = 0;
@@ -33,6 +34,7 @@ class Bird {
 		}
 	}
 
+	// space pressed, moving up
 	flap() {
 		this.velocity += veloStep * 1.5;
 		this.move(this.locY - floor(this.velocity));
@@ -40,6 +42,7 @@ class Bird {
 		this.checkBounds();
 	}
 
+	// space not pressed, moving down
 	notFlapping() {
 		this.velocity -= veloStep;
 		this.move(this.locY - floor(this.velocity));
@@ -47,6 +50,7 @@ class Bird {
 		this.checkBounds();
 	}
 
+	// update current bird state
 	update() {
 		if (keyIsDown(32)) {
 			GameState.firstKeyPressed = true;
@@ -56,10 +60,10 @@ class Bird {
 		}
 	}
 
+	// logic when rendering each frame
 	render() {
 		this.update();
 
-		console.log("Drawing bird at " + this.locX + ", " + this.locY);
 		fill("white");
 		rect(this.locX, this.locY, this.width, this.height);
 	}
